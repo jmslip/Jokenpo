@@ -87,14 +87,6 @@ class _GameState extends State<Game> {
     }
   }
 
-  /*
-  Pedra = 0 ; Papel = 1 ; tesoura = 2
-  Pedra + tesoura
-  Tesoura + papel
-  Papel + pedra
-
-   */
-
   @override
   Widget build(BuildContext context) {
     initialize();
