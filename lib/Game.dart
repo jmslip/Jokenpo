@@ -1,6 +1,6 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
+import 'package:jokenpo/JokenPoEnum.dart';
 
 class Game extends StatefulWidget {
   @override
@@ -9,27 +9,91 @@ class Game extends StatefulWidget {
 
 class _GameState extends State<Game> {
   var _title = "JokenPo";
-  Map<String, String> _imagesPath = Map();
-  var _computer = "padrao";
+
+  Map<int, String> _imagesPath = Map();
+  var _computer = JokenPoEnum.PADRAO.index;
+
+  List _textResultList = List();
+  var _textResult = 3; // Valor padrao
+
+  var _userChoise;
 
   void initialize() {
+    configTextResult();
     configImagesPath();
   }
 
+  void configTextResult() {
+    setState(() {
+      _textResultList.insert(0, "Você venceu! :)");
+      _textResultList.insert(1, "Você perdeu :(");
+      _textResultList.insert(2, "Empatou!");
+      _textResultList.insert(3, "Escola uma opção abaixo");
+    });
+  }
+
   void configImagesPath() {
-    _imagesPath["pedra"] = "images/pedra.png";
-    _imagesPath["papel"] = "images/papel.png";
-    _imagesPath["tesoura"] = "images/tesoura.png";
-    _imagesPath["padrao"] = "images/padrao.png";
+    setState(() {
+      _imagesPath[0] = "images/pedra.png";
+      _imagesPath[1] = "images/papel.png";
+      _imagesPath[2] = "images/tesoura.png";
+      _imagesPath[3] = "images/padrao.png";
+    });
   }
 
-  String getImagePath(String key) {
-    return _imagesPath[key];
+  String getImagePath(int key) {
+    if (_imagesPath != null) {
+      return _imagesPath[key];
+    } else {
+      return "images/padrao.png";
+    }
+
   }
 
-  void iaComputador() {
-    var numberRandom = Random().nextInt(max)
+  void iaComputer(int userChoise) {
+    var numberRandom = Random().nextInt(_imagesPath.length - 1);
+    setState(() {
+      _computer = numberRandom;
+      _userChoise = userChoise;
+      _textResult = calculateResult();
+    });
   }
+
+  String getTextResult(int key) {
+    return _textResultList.elementAt(key);
+  }
+
+  int calculateResult() {
+    if (_userChoise == _computer) {
+      return 2;
+    } else if (_userChoise == JokenPoEnum.PEDRA.index) {
+      if (_computer == JokenPoEnum.TESOURA.index) {
+        return 0;
+      } else {
+        return 1;
+      }
+    } else if (_userChoise == JokenPoEnum.PAPEL.index) {
+      if (_computer == JokenPoEnum.PEDRA.index) {
+        return 0;
+      } else {
+        return 1;
+      }
+    } else {
+      if (_computer == JokenPoEnum.PAPEL.index) {
+        return 0;
+      } else {
+        return 1;
+      }
+    }
+  }
+
+  /*
+  Pedra = 0 ; Papel = 1 ; tesoura = 2
+  Pedra + tesoura
+  Tesoura + papel
+  Papel + pedra
+
+   */
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +123,7 @@ class _GameState extends State<Game> {
               Padding(
                   padding: EdgeInsets.only(top: 32, bottom: 16),
                   child: Text(
-                      "Escolha uma opção abaixo",
+                      getTextResult(_textResult),
                       textAlign: TextAlign.center,
                       style: TextStyle(
                           fontSize: 20,
@@ -71,11 +135,17 @@ class _GameState extends State<Game> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
                   GestureDetector(
-                    onTap: (){print(getImagePath("padrao"));},
-                    child: Image.asset(getImagePath("pedra"), height: 95,),
+                    onTap: () => iaComputer(JokenPoEnum.PEDRA.index),
+                    child: Image.asset(getImagePath(JokenPoEnum.PEDRA.index), height: 95,),
                   ),
-                  Image.asset("images/papel.png", height: 95,),
-                  Image.asset("images/tesoura.png", height: 95,)
+                  GestureDetector(
+                    onTap: () => iaComputer(JokenPoEnum.PAPEL.index),
+                    child: Image.asset(getImagePath(JokenPoEnum.PAPEL.index), height: 95,),
+                  ),
+                  GestureDetector(
+                    onTap: () => iaComputer(JokenPoEnum.TESOURA.index),
+                    child: Image.asset(getImagePath(JokenPoEnum.TESOURA.index), height: 95,)
+                  ),
                 ],
               )
             ],
